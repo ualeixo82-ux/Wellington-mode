@@ -1,0 +1,563 @@
+-- Wellington Hub v3.6 - Aimbot + ESP (MOBILE)
+-- Script Estável e Funcional
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Camera = workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+
+-- Criar UI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "WellingtonHub"
+ScreenGui.Parent = game.CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Botão para mostrar/esconder UI
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Name = "ToggleButton"
+ToggleButton.Size = UDim2.new(0, 60, 0, 60)
+ToggleButton.Position = UDim2.new(0, 10, 0.5, -30)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+ToggleButton.Text = "🔫"
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.TextSize = 28
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.BorderSizePixel = 0
+ToggleButton.Parent = ScreenGui
+ToggleButton.AutoButtonColor = false
+
+local ToggleStroke = Instance.new("UIStroke")
+ToggleStroke.Color = Color3.fromRGB(255, 200, 0)
+ToggleStroke.Thickness = 2
+ToggleStroke.Parent = ToggleButton
+
+-- Frame Principal
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 300, 0, 400)
+MainFrame.Position = UDim2.new(0.5, -150, 0.1, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+MainFrame.Visible = false
+
+-- Título
+local TitleBar = Instance.new("Frame")
+TitleBar.Name = "TitleBar"
+TitleBar.Size = UDim2.new(1, 0, 0, 45)
+TitleBar.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+TitleBar.BorderSizePixel = 0
+TitleBar.Parent = MainFrame
+
+local TitleText = Instance.new("TextLabel")
+TitleText.Size = UDim2.new(1, -30, 1, 0)
+TitleText.BackgroundTransparency = 1
+TitleText.Text = "⚡ WELLINGTON HUB 📱"
+TitleText.TextColor3 = Color3.fromRGB(255, 200, 0)
+TitleText.TextSize = 16
+TitleText.Font = Enum.Font.GothamBlack
+TitleText.Parent = TitleBar
+
+local CloseButton = Instance.new("TextButton")
+CloseButton.Size = UDim2.new(0, 30, 0, 30)
+CloseButton.Position = UDim2.new(1, -35, 0, 7)
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 70, 70)
+CloseButton.Text = "✕"
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.TextSize = 16
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.BorderSizePixel = 0
+CloseButton.Parent = TitleBar
+
+-- Linha separadora dourada
+local Separator = Instance.new("Frame")
+Separator.Size = UDim2.new(1, -20, 0, 2)
+Separator.Position = UDim2.new(0, 10, 0, 50)
+Separator.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
+Separator.BorderSizePixel = 0
+Separator.Parent = MainFrame
+
+-- ============ ABAS ============
+local TabFrame = Instance.new("Frame")
+TabFrame.Size = UDim2.new(1, -20, 0, 30)
+TabFrame.Position = UDim2.new(0, 10, 0, 55)
+TabFrame.BackgroundTransparency = 1
+TabFrame.Parent = MainFrame
+
+local function createTab(name, position, width)
+    local tab = Instance.new("TextButton")
+    tab.Size = UDim2.new(0, width, 0, 30)
+    tab.Position = UDim2.new(0, position, 0, 0)
+    tab.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+    tab.Text = name
+    tab.TextColor3 = Color3.fromRGB(255, 255, 255)
+    tab.TextSize = 10
+    tab.Font = Enum.Font.GothamBold
+    tab.BorderSizePixel = 0
+    tab.Parent = TabFrame
+    return tab
+end
+
+local AimTab = createTab("🎯 AIM", 0, 130)
+local ESPTab = createTab("👁️ ESP", 140, 130)
+
+-- ============ CONTEÚDOS DAS ABAS ============
+local AimContent = Instance.new("Frame")
+AimContent.Size = UDim2.new(1, -20, 0, 290)
+AimContent.Position = UDim2.new(0, 10, 0, 90)
+AimContent.BackgroundTransparency = 1
+AimContent.Parent = MainFrame
+AimContent.Visible = true
+
+local ESPContent = Instance.new("Frame")
+ESPContent.Size = UDim2.new(1, -20, 0, 290)
+ESPContent.Position = UDim2.new(0, 10, 0, 90)
+ESPContent.BackgroundTransparency = 1
+ESPContent.Parent = MainFrame
+ESPContent.Visible = false
+
+-- ============ CONTEÚDO ABA AIM ============
+local AimbotButton = Instance.new("TextButton")
+AimbotButton.Size = UDim2.new(1, 0, 0, 45)
+AimbotButton.Position = UDim2.new(0, 0, 0, 0)
+AimbotButton.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+AimbotButton.Text = "🎯 AIMBOT OFF"
+AimbotButton.TextColor3 = Color3.fromRGB(255, 100, 100)
+AimbotButton.TextSize = 16
+AimbotButton.Font = Enum.Font.GothamBold
+AimbotButton.BorderSizePixel = 0
+AimbotButton.Parent = AimContent
+AimbotButton.AutoButtonColor = false
+
+local FOVLabel = Instance.new("TextLabel")
+FOVLabel.Size = UDim2.new(0, 120, 0, 25)
+FOVLabel.Position = UDim2.new(0, 0, 0, 55)
+FOVLabel.BackgroundTransparency = 1
+FOVLabel.Text = "Tamanho do FOV:"
+FOVLabel.TextColor3 = Color3.fromRGB(255, 200, 0)
+FOVLabel.TextSize = 13
+FOVLabel.Font = Enum.Font.GothamBold
+FOVLabel.Parent = AimContent
+
+local FOVBox = Instance.new("TextBox")
+FOVBox.Size = UDim2.new(0, 100, 0, 30)
+FOVBox.Position = UDim2.new(0, 130, 0, 50)
+FOVBox.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+FOVBox.Text = "100"
+FOVBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+FOVBox.TextSize = 14
+FOVBox.Font = Enum.Font.Gotham
+FOVBox.BorderSizePixel = 1
+FOVBox.BorderColor3 = Color3.fromRGB(255, 200, 0)
+FOVBox.Parent = AimContent
+
+local AimStrengthLabel = Instance.new("TextLabel")
+AimStrengthLabel.Size = UDim2.new(0, 120, 0, 25)
+AimStrengthLabel.Position = UDim2.new(0, 0, 0, 90)
+AimStrengthLabel.BackgroundTransparency = 1
+AimStrengthLabel.Text = "Suavidade:"
+AimStrengthLabel.TextColor3 = Color3.fromRGB(255, 200, 0)
+AimStrengthLabel.TextSize = 13
+AimStrengthLabel.Font = Enum.Font.GothamBold
+AimStrengthLabel.Parent = AimContent
+
+local AimStrengthSlider = Instance.new("TextBox")
+AimStrengthSlider.Size = UDim2.new(0, 100, 0, 30)
+AimStrengthSlider.Position = UDim2.new(0, 130, 0, 85)
+AimStrengthSlider.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+AimStrengthSlider.Text = "0.3"
+AimStrengthSlider.TextColor3 = Color3.fromRGB(255, 255, 255)
+AimStrengthSlider.TextSize = 14
+AimStrengthSlider.Font = Enum.Font.Gotham
+AimStrengthSlider.BorderSizePixel = 1
+AimStrengthSlider.BorderColor3 = Color3.fromRGB(255, 200, 0)
+AimStrengthSlider.Parent = AimContent
+
+local SmoothnessLabel = Instance.new("TextLabel")
+SmoothnessLabel.Size = UDim2.new(1, 0, 0, 20)
+SmoothnessLabel.Position = UDim2.new(0, 0, 0, 120)
+SmoothnessLabel.BackgroundTransparency = 1
+SmoothnessLabel.Text = "Predefinições:"
+SmoothnessLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+SmoothnessLabel.TextSize = 11
+SmoothnessLabel.Font = Enum.Font.Gotham
+SmoothnessLabel.Parent = AimContent
+
+local function createSmoothnessButton(text, value, position)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 85, 0, 28)
+    btn.Position = UDim2.new(0, position, 0, 140)
+    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+    btn.Text = text
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextSize = 11
+    btn.Font = Enum.Font.GothamBold
+    btn.BorderSizePixel = 0
+    btn.Parent = AimContent
+    btn.MouseButton1Click:Connect(function()
+        AimStrengthSlider.Text = value
+        aimSmoothness = tonumber(value)
+    end)
+    return btn
+end
+
+createSmoothnessButton("Muito Suave", "0.2", 0)
+createSmoothnessButton("Suave", "0.4", 95)
+createSmoothnessButton("Médio", "0.6", 190)
+
+local BodyPartLabel = Instance.new("TextLabel")
+BodyPartLabel.Size = UDim2.new(0, 120, 0, 25)
+BodyPartLabel.Position = UDim2.new(0, 0, 0, 175)
+BodyPartLabel.BackgroundTransparency = 1
+BodyPartLabel.Text = "Parte do Corpo:"
+BodyPartLabel.TextColor3 = Color3.fromRGB(255, 200, 0)
+BodyPartLabel.TextSize = 13
+BodyPartLabel.Font = Enum.Font.GothamBold
+BodyPartLabel.Parent = AimContent
+
+local HeadButton = Instance.new("TextButton")
+HeadButton.Size = UDim2.new(0, 85, 0, 28)
+HeadButton.Position = UDim2.new(0, 0, 0, 200)
+HeadButton.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
+HeadButton.Text = "Cabeça"
+HeadButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+HeadButton.TextSize = 12
+HeadButton.Font = Enum.Font.GothamBold
+HeadButton.BorderSizePixel = 0
+HeadButton.Parent = AimContent
+
+local TorsoButton = Instance.new("TextButton")
+TorsoButton.Size = UDim2.new(0, 85, 0, 28)
+TorsoButton.Position = UDim2.new(0, 95, 0, 200)
+TorsoButton.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+TorsoButton.Text = "Peito"
+TorsoButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+TorsoButton.TextSize = 12
+TorsoButton.Font = Enum.Font.GothamBold
+TorsoButton.BorderSizePixel = 0
+TorsoButton.Parent = AimContent
+
+local RandomButton = Instance.new("TextButton")
+RandomButton.Size = UDim2.new(0, 85, 0, 28)
+RandomButton.Position = UDim2.new(0, 190, 0, 200)
+RandomButton.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+RandomButton.Text = "Aleatório"
+RandomButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+RandomButton.TextSize = 12
+RandomButton.Font = Enum.Font.GothamBold
+RandomButton.BorderSizePixel = 0
+RandomButton.Parent = AimContent
+
+local TeamCheckButton = Instance.new("TextButton")
+TeamCheckButton.Size = UDim2.new(1, 0, 0, 28)
+TeamCheckButton.Position = UDim2.new(0, 0, 0, 235)
+TeamCheckButton.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
+TeamCheckButton.Text = "✅ Team Check ON"
+TeamCheckButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+TeamCheckButton.TextSize = 12
+TeamCheckButton.Font = Enum.Font.GothamBold
+TeamCheckButton.BorderSizePixel = 0
+TeamCheckButton.Parent = AimContent
+TeamCheckButton.AutoButtonColor = false
+
+local WallCheckButton = Instance.new("TextButton")
+WallCheckButton.Size = UDim2.new(1, 0, 0, 28)
+WallCheckButton.Position = UDim2.new(0, 0, 0, 268)
+WallCheckButton.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+WallCheckButton.Text = "🚫 Atravessa Paredes ON"
+WallCheckButton.TextColor3 = Color3.fromRGB(255, 100, 100)
+WallCheckButton.TextSize = 12
+WallCheckButton.Font = Enum.Font.GothamBold
+WallCheckButton.BorderSizePixel = 0
+WallCheckButton.Parent = AimContent
+WallCheckButton.AutoButtonColor = false
+
+-- ============ CONTEÚDO ABA ESP ============
+local ESPTitle = Instance.new("TextLabel")
+ESPTitle.Size = UDim2.new(1, 0, 0, 30)
+ESPTitle.Position = UDim2.new(0, 0, 0, 0)
+ESPTitle.BackgroundTransparency = 1
+ESPTitle.Text = "👁️ ESP CONFIG"
+ESPTitle.TextColor3 = Color3.fromRGB(255, 200, 0)
+ESPTitle.TextSize = 16
+ESPTitle.Font = Enum.Font.GothamBold
+ESPTitle.Parent = ESPContent
+
+-- Botão ESP Master ON/OFF
+local ESPMasterButton = Instance.new("TextButton")
+ESPMasterButton.Size = UDim2.new(1, 0, 0, 45)
+ESPMasterButton.Position = UDim2.new(0, 0, 0, 35)
+ESPMasterButton.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+ESPMasterButton.Text = "👁️ ESP MASTER OFF"
+ESPMasterButton.TextColor3 = Color3.fromRGB(255, 100, 100)
+ESPMasterButton.TextSize = 16
+ESPMasterButton.Font = Enum.Font.GothamBold
+ESPMasterButton.BorderSizePixel = 0
+ESPMasterButton.Parent = ESPContent
+ESPMasterButton.AutoButtonColor = false
+
+-- Opções de ESP
+local ESPOptionsLabel = Instance.new("TextLabel")
+ESPOptionsLabel.Size = UDim2.new(1, 0, 0, 25)
+ESPOptionsLabel.Position = UDim2.new(0, 0, 0, 85)
+ESPOptionsLabel.BackgroundTransparency = 1
+ESPOptionsLabel.Text = "Selecione as opções:"
+ESPOptionsLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+ESPOptionsLabel.TextSize = 13
+ESPOptionsLabel.Font = Enum.Font.Gotham
+ESPOptionsLabel.Parent = ESPContent
+
+-- ESP Box (Caixa)
+local ESPBoxButton = Instance.new("TextButton")
+ESPBoxButton.Size = UDim2.new(1, 0, 0, 40)
+ESPBoxButton.Position = UDim2.new(0, 0, 0, 115)
+ESPBoxButton.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+ESPBoxButton.Text = "📦 CAIXA OFF"
+ESPBoxButton.TextColor3 = Color3.fromRGB(255, 100, 100)
+ESPBoxButton.TextSize = 14
+ESPBoxButton.Font = Enum.Font.GothamBold
+ESPBoxButton.BorderSizePixel = 0
+ESPBoxButton.Parent = ESPContent
+ESPBoxButton.AutoButtonColor = false
+
+-- ESP Line (Linha)
+local ESPLineButton = Instance.new("TextButton")
+ESPLineButton.Size = UDim2.new(1, 0, 0, 40)
+ESPLineButton.Position = UDim2.new(0, 0, 0, 160)
+ESPLineButton.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+ESPLineButton.Text = "〰️ LINHA OFF"
+ESPLineButton.TextColor3 = Color3.fromRGB(255, 100, 100)
+ESPLineButton.TextSize = 14
+ESPLineButton.Font = Enum.Font.GothamBold
+ESPLineButton.BorderSizePixel = 0
+ESPLineButton.Parent = ESPContent
+ESPLineButton.AutoButtonColor = false
+
+-- ESP Name (Nome)
+local ESPNameButton = Instance.new("TextButton")
+ESPNameButton.Size = UDim2.new(1, 0, 0, 40)
+ESPNameButton.Position = UDim2.new(0, 0, 0, 205)
+ESPNameButton.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+ESPNameButton.Text = "📝 NOME OFF"
+ESPNameButton.TextColor3 = Color3.fromRGB(255, 100, 100)
+ESPNameButton.TextSize = 14
+ESPNameButton.Font = Enum.Font.GothamBold
+ESPNameButton.BorderSizePixel = 0
+ESPNameButton.Parent = ESPContent
+ESPNameButton.AutoButtonColor = false
+
+-- ESP Distance (Distância)
+local ESPDistanceButton = Instance.new("TextButton")
+ESPDistanceButton.Size = UDim2.new(1, 0, 0, 40)
+ESPDistanceButton.Position = UDim2.new(0, 0, 0, 250)
+ESPDistanceButton.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+ESPDistanceButton.Text = "📏 DISTÂNCIA OFF"
+ESPDistanceButton.TextColor3 = Color3.fromRGB(255, 100, 100)
+ESPDistanceButton.TextSize = 14
+ESPDistanceButton.Font = Enum.Font.GothamBold
+ESPDistanceButton.BorderSizePixel = 0
+ESPDistanceButton.Parent = ESPContent
+ESPDistanceButton.AutoButtonColor = false
+
+-- ============ VARIÁVEIS E CONFIGURAÇÕES ============
+local aimbotEnabled = false
+local teamCheck = true
+local wallCheck = true
+local aimbotPart = "Head"
+local aimFOV = 100
+local aimSmoothness = 0.3
+
+-- ESP Configurações
+local espEnabled = false
+local espBoxEnabled = false
+local espLineEnabled = false
+local espNameEnabled = false
+local espDistanceEnabled = false
+
+-- Tabelas para armazenar desenhos ESP
+local espDrawings = {}
+
+-- ============ DESENHAR FOV (PONTO CENTRAL) ============
+local FOVOuterCircle = Drawing.new("Circle")
+FOVOuterCircle.Visible = false
+FOVOuterCircle.Color = Color3.fromRGB(255, 255, 255)
+FOVOuterCircle.Thickness = 2
+FOVOuterCircle.Transparency = 0.7
+FOVOuterCircle.Radius = aimFOV
+FOVOuterCircle.Filled = false
+
+local FOVInnerDot = Drawing.new("Circle")
+FOVInnerDot.Visible = false
+FOVInnerDot.Color = Color3.fromRGB(255, 200, 0)
+FOVInnerDot.Thickness = 1
+FOVInnerDot.Transparency = 1
+FOVInnerDot.Radius = 4
+FOVInnerDot.Filled = true
+
+local FOVCrosshairH = Drawing.new("Line")
+FOVCrosshairH.Visible = false
+FOVCrosshairH.Color = Color3.fromRGB(255, 200, 0)
+FOVCrosshairH.Thickness = 1
+FOVCrosshairH.Transparency = 0.5
+
+local FOVCrosshairV = Drawing.new("Line")
+FOVCrosshairV.Visible = false
+FOVCrosshairV.Color = Color3.fromRGB(255, 200, 0)
+FOVCrosshairV.Thickness = 1
+FOVCrosshairV.Transparency = 0.5
+
+-- ============ FUNÇÕES DO AIMBOT (MOBILE) ============
+local function getClosestPlayerToCenter()
+    local viewportSize = Camera.ViewportSize
+    local centerX = viewportSize.X / 2
+    local centerY = viewportSize.Y / 2
+    local closestPlayer = nil
+    local shortestDistance = aimFOV
+    
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character then
+            local character = player.Character
+            local humanoid = character:FindFirstChild("Humanoid")
+            
+            if humanoid and humanoid.Health > 0 then
+                if teamCheck and player.Team == LocalPlayer.Team then
+                    continue
+                end
+                
+                local targetPart = character:FindFirstChild(aimbotPart)
+                if aimbotPart == "Random" then
+                    local parts = {"Head", "UpperTorso", "LowerTorso", "LeftArm", "RightArm", "LeftLeg", "RightLeg"}
+                    targetPart = character:FindFirstChild(parts[math.random(#parts)])
+                end
+                
+                if not targetPart then
+                    targetPart = character:FindFirstChild("Head")
+                end
+                
+                if targetPart then
+                    local screenPos, onScreen = Camera:WorldToViewportPoint(targetPart.Position)
+                    
+                    if onScreen then
+                        local distance = (Vector2.new(screenPos.X, screenPos.Y) - Vector2.new(centerX, centerY)).Magnitude
+                        
+                        if distance < shortestDistance then
+                            if wallCheck then
+                                local raycastParams = RaycastParams.new()
+                                raycastParams.FilterDescendantsInstances = {LocalPlayer.Character}
+                                raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+                                
+                                local direction = (targetPart.Position - Camera.CFrame.Position).Unit
+                                local rayResult = workspace:Raycast(Camera.CFrame.Position, direction * 1000, raycastParams)
+                                
+                                if rayResult and rayResult.Instance:IsDescendantOf(character) then
+                                    shortestDistance = distance
+                                    closestPlayer = targetPart
+                                end
+                            else
+                                shortestDistance = distance
+                                closestPlayer = targetPart
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    
+    return closestPlayer
+end
+
+-- ============ FUNÇÕES ESP ============
+local function createESPForPlayer(player)
+    if espDrawings[player.Name] then
+        clearESPForPlayer(player)
+    end
+    
+    local drawings = {}
+    
+    -- Criar Box (retângulo)
+    if espBoxEnabled then
+        local boxOutline = Drawing.new("Square")
+        boxOutline.Visible = false
+        boxOutline.Color = Color3.fromRGB(255, 255, 255)
+        boxOutline.Thickness = 2
+        boxOutline.Transparency = 1
+        boxOutline.Filled = false
+        drawings.boxOutline = boxOutline
+        
+        local boxFill = Drawing.new("Square")
+        boxFill.Visible = false
+        boxFill.Color = Color3.fromRGB(255, 255, 255)
+        boxFill.Thickness = 1
+        boxFill.Transparency = 0.8
+        boxFill.Filled = true
+        drawings.boxFill = boxFill
+    end
+    
+    -- Criar Linha
+    if espLineEnabled then
+        local line = Drawing.new("Line")
+        line.Visible = false
+        line.Color = Color3.fromRGB(255, 255, 255)
+        line.Thickness = 1
+        line.Transparency = 0.7
+        drawings.line = line
+    end
+    
+    -- Criar Nome
+    if espNameEnabled then
+        local name = Drawing.new("Text")
+        name.Visible = false
+        name.Color = Color3.fromRGB(255, 255, 255)
+        name.Size = 16
+        name.Center = true
+        name.Outline = true
+        name.OutlineColor = Color3.fromRGB(0, 0, 0)
+        drawings.name = name
+    end
+    
+    -- Criar Distância
+    if espDistanceEnabled then
+        local distance = Drawing.new("Text")
+        distance.Visible = false
+        distance.Color = Color3.fromRGB(255, 200, 0)
+        distance.Size = 14
+        distance.Center = true
+        distance.Outline = true
+        distance.OutlineColor = Color3.fromRGB(0, 0, 0)
+        drawings.distance = distance
+    end
+    
+    espDrawings[player.Name] = drawings
+end
+
+local function clearESPForPlayer(player)
+    if espDrawings[player.Name] then
+        for _, drawing in pairs(espDrawings[player.Name]) do
+            drawing:Remove()
+        end
+        espDrawings[player.Name] = nil
+    end
+end
+
+local function clearAllESP()
+    for playerName, _ in pairs(espDrawings) do
+        local player = Players:FindFirstChild(playerName)
+        if player then
+            clearESPForPlayer(player)
+        end
+    end
+    espDrawings = {}
+end
+
+local function updateESP()
+    local viewportSize = Camera.ViewportSize
+    local centerX = viewportSize.X / 2
+    
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character then
+            local character = player.Character
+            local huma
